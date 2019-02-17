@@ -220,8 +220,7 @@ All examples from herein use the fluent syntax, as we believe it makes it easier
       ? async()
     return
       $some-task ? RUN-UNSAFE()
-    :)
-    ```xquery
+    ```
 
 2. Asynchronously executing a task, when you do care about the result, you have to wait upon the asynchronous computation
     ```xquery
