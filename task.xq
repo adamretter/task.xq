@@ -121,28 +121,10 @@ declare %private function task:create-monadic-task($apply-fn as function(element
 
     'async': function() as map(xs:string, function(*)) {
       let $async-apply-fn := function($realworld as element(adt:realworld)) as item() + {
-
-        val my-promise = new Promise(function(resolve, reject) {
-        
-            try {
-                let $exec-NO-async := $apply-fn($realworld)
-                return
-                    resolve($exec-NO-async)
-            } catch * {
-                reject($err:code)
-            }
-        
-        });
-        
-        (:
         let $exec-NO-async := $apply-fn($realworld)
-        :)
-        
         let $async-a := function($scheduler as element(adt:scheduler)) as item()+ {
-                ($scheduler, my-promise (:fn:tail($exec-NO-async):))
+                ($scheduler, fn:tail($exec-NO-async))
         }
-        
-        
         return
           (: NOTE - we use $realworld and NOT fn:head($exec-NO-async) as
           the realworld in the return, because our (theoretically) asynchronously
@@ -430,11 +412,7 @@ declare function task:wait($async as function(element(adt:scheduler)) as item()+
   let $wait-apply-fn := function($realworld as element(adt:realworld)) as item()+ {
     let $async-res := $async(<adt:scheduler/>)
     return
-        
-        (: $async-res is your actual JavaScript promise, created in async :)
-        let $result := await $async-res
-    
-      ($realworld, $result  (:fn:tail($async-res) :))
+      ($realworld, fn:tail($async-res))
   }
   return
     task:create-monadic-task($wait-apply-fn)
